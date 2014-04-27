@@ -29,6 +29,11 @@ Finally, edit the ``urls.py`` file of your project to add the
         url(r'^taggit_autocomplete_modified/', include('taggit_autocomplete_modified.urls')),
     )
 
+Modify your template/s
+======================
+
+Ensure that jQuery is linked to before the {{ form.media }} is rendered in your template/s
+
 Reference of the application settings
 =====================================
 
