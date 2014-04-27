@@ -34,16 +34,21 @@ from taggit.utils import edit_string_for_tags
 from taggit_autocomplete_modified import settings
 
 
+media_url = settings.TAGGIT_AUTOCOMPLETE_MEDIA_URL
+if media_url[-1] != '/':
+    media_url += '/'
+
+
 class TagAutocomplete(Input):
     input_type = 'text'
     
     class Media:
         css = {
-            'all': ('%sjquery.autocomplete.css' % settings.TAGGIT_AUTOCOMPLETE_MEDIA_URL,)
+            'all': ('%sjquery.autocomplete.css' % media_url,)
         }
         js = (
-            '%sjquery.min.js' % settings.TAGGIT_AUTOCOMPLETE_MEDIA_URL,
-            '%sjquery.autocomplete.js' % settings.TAGGIT_AUTOCOMPLETE_MEDIA_URL,
+            '%sjquery.autocomplete.js' % media_url,
+            '%sautocomplete.js' % media_url,
         )
     
     def render(self, name, value, attrs=None):
@@ -52,7 +57,11 @@ class TagAutocomplete(Input):
             # Here we retrieve a comma-delimited list of tags suitable for editing by the user.
             value = edit_string_for_tags([o.tag for o in value.select_related('tag')])
         json_view = reverse('taggit_autocomplete_modified_tag_list')
+        if 'class' in attrs:
+            attrs['class'] += ' autocomplete'
+        else:
+            attrs['class'] = 'autocomplete'
+        attrs['autocomplete-url'] = json_view
         html = super(TagAutocomplete, self).render(name, value, attrs)
-        js = u'<script type="text/javascript">jQuery().ready(function() { jQuery("#%s").autocomplete("%s", { multiple: true }); });</script>' % (attrs['id'], json_view)
-        return mark_safe("\n".join([html, js]))
+        return mark_safe(html)
     
